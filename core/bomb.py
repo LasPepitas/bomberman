@@ -1,7 +1,7 @@
 import time
 
 class Bomba:
-    def __init__(self, x, y, tiempo_creacion=None, duracion=2, radio=1):
+    def __init__(self, x, y, tiempo_creacion=None, duracion=2, radio=2):
         self.x = x
         self.y = y
         self.tiempo_creacion = tiempo_creacion or time.time()
@@ -25,11 +25,31 @@ class Bomba:
                     if mapa[ny][nx] == "#":
                         break
                     
-                    elif mapa[ny][nx] == "*":
-                        mapa[ny][nx] = " "  
-                
                     casillas_afectadas.append((nx, ny))
+                    if mapa[ny][nx] == "*":
+                        #mapa[ny][nx] = " "
+                        break  
+                
                 else:
                     break  
 
         return casillas_afectadas
+
+
+class ExplosionVisual:
+    def __init__(self, x, y, frames, frame_duration=0.2):
+        self.x = x
+        self.y = y
+        self.frames = frames 
+        self.frame_duration = frame_duration
+        self.tiempo_inicio = time.time()
+
+    def dibujar(self, pantalla, tamaño_celda):
+        tiempo_actual = time.time() - self.tiempo_inicio
+        idx = int(tiempo_actual / self.frame_duration)
+        if idx < len(self.frames):
+            img = self.frames[idx]
+            pantalla.blit(img, (self.x * tamaño_celda, self.y * tamaño_celda))
+
+    def ha_terminado(self):
+        return time.time() - self.tiempo_inicio > len(self.frames) * self.frame_duration

@@ -1,13 +1,14 @@
 import pygame
 
 class Jugador:
-    def __init__(self, x, y):
+    def __init__(self, x, y, imagen):
         self.x = x  
         self.y = y
         self.color = (0, 255, 0)  
         self.vivo = True
         self.dx = 0  
         self.dy = 0 
+        self.imagen = pygame.transform.scale(imagen, (40, 40))
 
     def mover(self, dx, dy, mapa):
         nueva_x = self.x + dx
@@ -21,5 +22,7 @@ class Jugador:
 
     def dibujar(self, pantalla, tamaño_celda):
         if self.vivo:
-            rect = pygame.Rect(self.x * tamaño_celda, self.y * tamaño_celda, tamaño_celda, tamaño_celda)
-            pygame.draw.rect(pantalla, self.color, rect)
+            #rect = pygame.Rect(self.x * tamaño_celda, self.y * tamaño_celda, tamaño_celda, #tamaño_celda)
+            #pygame.draw.rect(pantalla, self.color, rect)
+            pos = (self.x * tamaño_celda, self.y * tamaño_celda)
+            pantalla.blit(self.imagen, pos)

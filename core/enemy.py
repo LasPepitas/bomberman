@@ -2,7 +2,7 @@ import pygame
 import random
 import threading
 import time
-from core.utils import a_estrella, obtener_zona_explosion
+from core.utils import a_estrella, obtener_zona_explosion, cargar_frames
 
 class EnemigoBase:
     def __init__(self, x, y, mapa):
@@ -10,11 +10,42 @@ class EnemigoBase:
         self.y = y
         self.mapa = mapa
         self.vivo = True
+        self.direccion_actual = "down"
+        self.frames_por_direccion = {}
+        self.frame_actual = 0
+        self.tiempo_ultimo_frame = time.time()
+        self.intervalo_frame = 0.25
+        self.muriendo = False  
+        self.muerte_completada = False 
 
     def dibujar(self, pantalla, tam_celda):
-        if self.vivo:
+        if self.direccion_actual in self.frames_por_direccion:
+            frames = self.frames_por_direccion[self.direccion_actual]
+            ahora = time.time()
+
+            if ahora - self.tiempo_ultimo_frame >= self.intervalo_frame:
+                if self.direccion_actual == "dead":
+                    if self.frame_actual < len(frames) - 1:
+                        self.frame_actual += 1 
+                    else:
+                        self.muerte_completada = True
+                else:
+                    self.frame_actual = (self.frame_actual + 1) % len(frames)
+                self.tiempo_ultimo_frame = ahora
+
+            imagen = frames[self.frame_actual]
+            pantalla.blit(imagen, (self.x * tam_celda, self.y * tam_celda))
+        else:
             rect = pygame.Rect(self.x * tam_celda, self.y * tam_celda, tam_celda, tam_celda)
             pygame.draw.rect(pantalla, self.color(), rect)
+
+    def morir(self):
+        if not self.muriendo:
+            self.vivo = False
+            self.muriendo = True
+            self.direccion_actual = "dead"
+            self.frame_actual = 0
+            self.tiempo_ultimo_frame = time.time()
 
     def color(self):
         return (255, 0, 0) 
@@ -24,6 +55,9 @@ class EnemigoBasico(EnemigoBase):
     def __init__(self, x, y, mapa, obtener_bombas=None):
         super().__init__(x, y, mapa)
         self.obtener_bombas = obtener_bombas or (lambda: set())
+        self.frames_por_direccion = {
+            "dead": cargar_frames("dead", 3)  
+        }
         self.thread = threading.Thread(target=self._mover_aleatorio, daemon=True)
         self.thread.start()
 
@@ -32,15 +66,10 @@ class EnemigoBasico(EnemigoBase):
             self.mover()
             time.sleep(0.6)
 
-    # def mover(self):
-    #     direcciones = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    #     random.shuffle(direcciones)
-    #     for dx, dy in direcciones:
-    #         nx, ny = self.x + dx, self.y + dy
-    #         if 0 <= ny < len(self.mapa) and 0 <= nx < len(self.mapa[0]) and self.mapa[ny][nx] == " ":
-    #             self.x, self.y = nx, ny
-    #             break
     def mover(self):
+        if self.muriendo: 
+            return
+            
         direcciones = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         random.shuffle(direcciones)
 
@@ -55,7 +84,6 @@ class EnemigoBasico(EnemigoBase):
             return False
         return self.mapa[y][x] == " " and (x, y) not in self.obtener_bombas()
 
-
     def color(self):
         return (255, 100, 100) 
 
@@ -65,19 +93,48 @@ class EnemigoInteligente(EnemigoBase):
         super().__init__(x, y, mapa)
         self.jugador = jugador
         self.obtener_bombas = obtener_bombas
+        self.frames_por_direccion = {
+            "up": cargar_frames("up", 3),
+            "down": cargar_frames("down", 3),
+            "left": cargar_frames("left", 3),
+            "right": cargar_frames("right", 3),
+            "dead": cargar_frames("dead", 3)
+        }
+        self.direccion_actual = "down"
+        self.frame_actual = 0
+        self.tiempo_ultimo_frame = time.time()
+        self.frame_intervalo = 0.15 
         self.thread = threading.Thread(target=self._seguir_jugador, daemon=True)
         self.thread.start()
 
     def _seguir_jugador(self):
         while self.vivo:
+            if self.muriendo: 
+                time.sleep(0.1)
+                continue
+                
             bombas = self.obtener_bombas() if self.obtener_bombas else set()
             camino = a_estrella((self.x, self.y), (self.jugador.x, self.jugador.y), self.mapa, bombas)
             if camino:
-                self.x, self.y = camino[0]
+                nx, ny = camino[0]
+                dx = nx - self.x
+                dy = ny - self.y
+
+                if dx == 1:
+                    self.direccion_actual = "right"
+                elif dx == -1:
+                    self.direccion_actual = "left"
+                elif dy == 1:
+                    self.direccion_actual = "down"
+                elif dy == -1:
+                    self.direccion_actual = "up"
+
+                self.x, self.y = nx, ny
             time.sleep(0.4)
 
     def color(self):
         return (255, 0, 255) 
+
     
 class EnemigoAvanzado(EnemigoBase):
     def __init__(self, x, y, mapa, jugador, obtener_bombas=None, plantar_bomba_cb=None):
@@ -85,11 +142,18 @@ class EnemigoAvanzado(EnemigoBase):
         self.jugador = jugador
         self.obtener_bombas = obtener_bombas
         self.plantar_bomba_cb = plantar_bomba_cb
+        self.frames_por_direccion = {
+            "dead": cargar_frames("dead", 3)
+        }
         self.thread = threading.Thread(target=self._inteligencia, daemon=True)
         self.thread.start()
 
     def _inteligencia(self):
         while self.vivo:
+            if self.muriendo:
+                time.sleep(0.1)
+                continue
+                
             bombas = self.obtener_bombas() if self.obtener_bombas else set()
             zona_peligrosa = set()
             bloqueos = set()

@@ -1,4 +1,5 @@
 import heapq
+import pygame
 
 def a_estrella(inicio, objetivo, mapa, obstaculos_extra=None):
     filas = len(mapa)
@@ -55,3 +56,11 @@ def obtener_zona_explosion(bomba, alcance=3):
             else:
                 break
     return zona
+
+def cargar_frames(direccion, cantidad, carpeta="ui/assets/images/enemigos/dragon"):
+    return [
+        pygame.transform.scale(
+            pygame.image.load(f"{carpeta}/dragon_{direccion}{i}.png").convert_alpha(),
+            (40, 40)
+        ) for i in range(1, cantidad + 1)
+    ]
