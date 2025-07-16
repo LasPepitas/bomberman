@@ -36,10 +36,16 @@ def ejecutar_juego(pantalla):
     ]
     bomb_frames = [pygame.transform.scale(f, (TAM_CELDA, TAM_CELDA)) for f in bomb_frames]
 
+    imagenes_poderes = {
+        "+B": pygame.transform.scale(pygame.image.load("ui/assets/images/bomb_power.png"), (TAM_CELDA, TAM_CELDA)),
+        "+R": pygame.transform.scale(pygame.image.load("ui/assets/images/fire.png"), (TAM_CELDA, TAM_CELDA)),
+        "+V": pygame.transform.scale(pygame.image.load("ui/assets/images/speed_power.png"), (TAM_CELDA, TAM_CELDA))
+    }
+
     pared_img = pygame.transform.scale(pared_img, (TAM_CELDA, TAM_CELDA))
     bloque_img = pygame.transform.scale(bloque_img, (TAM_CELDA, TAM_CELDA))
     suelo_img = pygame.transform.scale(suelo_img, (TAM_CELDA, TAM_CELDA))
-    imagen_jugador = pygame.image.load("ui/assets/images/player_down_1.png").convert_alpha()
+    imagen_jugador = pygame.image.load("ui/assets/images/player/player_down1.png").convert_alpha()
     
     jugador1 = Jugador(1, 1, imagen_jugador)
     nivel_actual = 1
@@ -60,7 +66,6 @@ def ejecutar_juego(pantalla):
 
         for y, fila in enumerate(MAPA):
             for x, celda in enumerate(fila):
-                #rect = pygame.Rect(x * TAM_CELDA, y * TAM_CELDA, TAM_CELDA, TAM_CELDA)
                 pos = (x * TAM_CELDA, y * TAM_CELDA)
                 if celda == "#":
                     pantalla.blit(bloque_img, pos)
@@ -70,6 +75,9 @@ def ejecutar_juego(pantalla):
                     #pygame.draw.rect(pantalla, (160, 110, 50), rect)
                 else:
                     pantalla.blit(suelo_img, pos)
+                    
+                    if celda in imagenes_poderes:
+                        pantalla.blit(imagenes_poderes[celda], pos)
                     #pygame.draw.rect(pantalla, (0, 0, 0), rect)
 
         for evento in pygame.event.get():
@@ -86,7 +94,9 @@ def ejecutar_juego(pantalla):
                 elif evento.key == pygame.K_LEFT:
                     jugador1.mover(-1, 0, MAPA)
                 if evento.key == pygame.K_SPACE:
-                    bombas.append(Bomba(jugador1.x, jugador1.y))
+                    bombas_activas = sum(1 for b in bombas if not b.exploto)
+                    if bombas_activas < jugador1.max_bombas:
+                        bombas.append(Bomba(jugador1.x, jugador1.y, radio=jugador1.rango_explosion))
 
         if not jugador1.vivo:
             fuente_game_over = pygame.font.Font("ui/assets/fonts/Pixeboy.ttf", 64)
@@ -111,10 +121,10 @@ def ejecutar_juego(pantalla):
                     
                     if jugador1.vivo and jugador1.x == bx and jugador1.y == by:
                         jugador1.vivo = False
+                        jugador1.frame_actual = 0
                     
                     for enemigo in enemigos:
                         if enemigo.vivo and enemigo.x == bx and enemigo.y == by:
-                            #enemigo.vivo = False
                             enemigo.morir()
                         
                     rect = pygame.Rect(bx * TAM_CELDA, by * TAM_CELDA, TAM_CELDA, TAM_CELDA)
@@ -144,7 +154,6 @@ def ejecutar_juego(pantalla):
                     if (x, y) == (jugador1.x, jugador1.y):
                         jugador1.vivo = False
                     for enemigo in enemigos:
-                        #if (x, y) == (enemigo.x, enemigo.y):
                         if (x, y) == (enemigo.x, enemigo.y) and enemigo.vivo:
                             #enemigo.vivo = False
                             enemigo.morir()

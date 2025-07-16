@@ -1,4 +1,3 @@
-# ui/audio_manager.py
 import pygame
 import threading
 import time

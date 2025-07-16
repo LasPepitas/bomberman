@@ -1,4 +1,5 @@
 import time
+import random
 
 class Bomba:
     def __init__(self, x, y, tiempo_creacion=None, duracion=2, radio=2):
@@ -27,11 +28,16 @@ class Bomba:
                     
                     casillas_afectadas.append((nx, ny))
                     if mapa[ny][nx] == "*":
-                        #mapa[ny][nx] = " "
-                        break  
-                
+                        if random.random() < 0.3:
+                            mapa[ny][nx] = random.choice(["+B", "+R", "+V"])
+                        else:
+                            mapa[ny][nx] = " "
+                        break
+                    
                 else:
                     break  
+        
+        print(casillas_afectadas, self.radio)
 
         return casillas_afectadas
 

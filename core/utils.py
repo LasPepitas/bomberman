@@ -64,3 +64,28 @@ def cargar_frames(direccion, cantidad, carpeta="ui/assets/images/enemigos/dragon
             (40, 40)
         ) for i in range(1, cantidad + 1)
     ]
+
+
+def cargar_frames_vampire(direccion, cantidad, carpeta="ui/assets/images/enemigos/vampiro"):
+    return [
+        pygame.transform.scale(
+            pygame.image.load(f"{carpeta}/vampire_{direccion}{i}.png").convert_alpha(),
+            (40, 40)
+        ) for i in range(1, cantidad + 1)
+    ]
+    
+def cargar_frames_calavera(direccion, cantidad, carpeta="ui/assets/images/enemigos/calavera"):
+    return [
+        pygame.transform.scale(
+            pygame.image.load(f"{carpeta}/calavera_{direccion}{i}.png").convert_alpha(),
+            (40, 40)
+        ) for i in range(1, cantidad + 1)
+    ]
+
+def cargar_frames_jugador(direccion, cantidad, carpeta="ui/assets/images/player/"):
+    return [
+        pygame.transform.scale(
+            pygame.image.load(f"{carpeta}/player_{direccion}{i}.png").convert_alpha(),
+            (40, 40)
+        ) for i in range(1, cantidad + 1)
+    ]

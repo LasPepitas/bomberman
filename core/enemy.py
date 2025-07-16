@@ -2,7 +2,7 @@ import pygame
 import random
 import threading
 import time
-from core.utils import a_estrella, obtener_zona_explosion, cargar_frames
+from core.utils import a_estrella, obtener_zona_explosion, cargar_frames, cargar_frames_vampire, cargar_frames_calavera
 
 class EnemigoBase:
     def __init__(self, x, y, mapa):
@@ -56,8 +56,16 @@ class EnemigoBasico(EnemigoBase):
         super().__init__(x, y, mapa)
         self.obtener_bombas = obtener_bombas or (lambda: set())
         self.frames_por_direccion = {
-            "dead": cargar_frames("dead", 3)  
+            "up": cargar_frames_vampire("up", 3),
+            "down": cargar_frames_vampire("down", 3),
+            "left": cargar_frames_vampire("left", 3),
+            "right": cargar_frames_vampire("right", 3),
+            "dead": cargar_frames_vampire("dead", 3)
         }
+        self.direccion_actual = "down"
+        self.frame_actual = 0
+        self.tiempo_ultimo_frame = time.time()
+        self.frame_intervalo = 0.15 
         self.thread = threading.Thread(target=self._mover_aleatorio, daemon=True)
         self.thread.start()
 
@@ -65,18 +73,20 @@ class EnemigoBasico(EnemigoBase):
         while self.vivo:
             self.mover()
             time.sleep(0.6)
-
+    
     def mover(self):
-        if self.muriendo: 
+        if self.muriendo:
+            self.direccion_actual = "dead"
             return
-            
-        direcciones = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+        direcciones = [((0, 1), "down"), ((0, -1), "up"), ((1, 0), "right"), ((-1, 0), "left")]
         random.shuffle(direcciones)
 
-        for dx, dy in direcciones:
+        for (dx, dy), direccion in direcciones:
             nx, ny = self.x + dx, self.y + dy
             if self._es_celda_libre(nx, ny):
                 self.x, self.y = nx, ny
+                self.direccion_actual = direccion
                 break
 
     def _es_celda_libre(self, x, y):
@@ -143,8 +153,16 @@ class EnemigoAvanzado(EnemigoBase):
         self.obtener_bombas = obtener_bombas
         self.plantar_bomba_cb = plantar_bomba_cb
         self.frames_por_direccion = {
-            "dead": cargar_frames("dead", 3)
+            "up": cargar_frames_calavera("up", 3),
+            "down": cargar_frames_calavera("down", 3),
+            "left": cargar_frames_calavera("left", 3),
+            "right": cargar_frames_calavera("right", 3),
+            "dead": cargar_frames_calavera("dead", 3)
         }
+        self.direccion_actual = "down"
+        self.frame_actual = 0
+        self.tiempo_ultimo_frame = time.time()
+        self.frame_intervalo = 0.15 
         self.thread = threading.Thread(target=self._inteligencia, daemon=True)
         self.thread.start()
 
@@ -181,7 +199,21 @@ class EnemigoAvanzado(EnemigoBase):
             camino = a_estrella((self.x, self.y), objetivo, self.mapa, bloqueos | zona_peligrosa)
 
             if camino:
-                self.x, self.y = camino[0]
+                nx, ny = camino[0]
+                dx = nx - self.x
+                dy = ny - self.y
+
+                if dx == 1:
+                    self.direccion_actual = "right"
+                elif dx == -1:
+                    self.direccion_actual = "left"
+                elif dy == 1:
+                    self.direccion_actual = "down"
+                elif dy == -1:
+                    self.direccion_actual = "up"
+
+                self.x, self.y = nx, ny
+
 
             if abs(self.x - self.jugador.x) + abs(self.y - self.jugador.y) <= 1:
                 if self.plantar_bomba_cb:
