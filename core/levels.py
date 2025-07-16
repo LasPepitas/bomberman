@@ -46,7 +46,7 @@ def cargar_nivel(nivel, jugador, obtener_bombas, bombas, plantar_bomba_cb):
             ],
             "enemigos": [
                 ["basico", 5, 5],
-                ["avanzado", 13, 11]
+                ["inteligente", 13, 11]
             ],
             "inicio_jugador": [1, 1]
         },
@@ -69,7 +69,7 @@ def cargar_nivel(nivel, jugador, obtener_bombas, bombas, plantar_bomba_cb):
                 "###################"
             ],
             "enemigos": [
-                ["avanzado", 15, 3],
+                ["inteligente", 15, 3],
                 ["basico", 5, 11]
             ],
             "inicio_jugador": [1, 1]
@@ -165,7 +165,7 @@ def cargar_nivel(nivel, jugador, obtener_bombas, bombas, plantar_bomba_cb):
                 "###################"
             ],
             "enemigos": [
-                ["avanzado", 3, 3],
+                ["inteligente", 3, 3],
                 ["avanzado", 15, 11]
             ],
             "inicio_jugador": [1, 1]
