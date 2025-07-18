@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
+
 from ui.menu import iniciar_juego
 import pygame
 
