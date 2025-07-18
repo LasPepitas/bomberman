@@ -1,46 +1,17 @@
----
+## ▶️ Instrucciones de Ejecución (Windows)
 
-## ✅ Requisitos
-
-- Tener **Python 3** instalado.
-- No se requiere conexión a internet ni instalación adicional de dependencias.
-- Las librerías necesarias (como `pygame`) están incluidas en la carpeta `lib/`.
-
----
-
-## ▶️ Instrucciones de Ejecución
-
-### 🔹 En **Linux/macOS**
-
-1. Abre una terminal.
-2. Navega a la carpeta del proyecto.
-3. Ejecuta:
-
-```bash
-python3 main.py
-```
-
-> ℹ️ Si `python3` no está disponible, instálalo usando tu gestor de paquetes:
-
-```bash
-sudo apt install python3
-```
-
----
-
-### 🔹 En **Windows**
-
-1. Abre una ventana de comandos (`cmd`) o PowerShell.
-2. Navega a la carpeta del proyecto.
-3. Ejecuta:
+1. Asegúrate de tener **Python 3 instalado y agregado al PATH**.
+2. No necesitas internet ni instalar dependencias.
+3. Abre una ventana de comandos (cmd) o PowerShell.
+4. Navega a la carpeta del proyecto.
+5. Ejecuta:
 
 ```cmd
 python main.py
 ```
 
-> ℹ️ Si `python` no es reconocido, asegúrate de que **Python 3 esté instalado y agregado al PATH del sistema**.
+> 🔒 El juego utiliza una carpeta `lib/` con `pygame` preinstalado, por lo que funcionará sin conexión.
 
----
 
 ## 🎨 Sprites
 
