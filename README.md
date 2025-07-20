@@ -1,13 +1,13 @@
 ## ▶️ Instrucciones de Ejecución (Windows)
 
-1. Asegúrate de tener **Python 3 instalado y agregado al PATH**.
-2. No necesitas internet ni instalar dependencias.
+1. No necesitas tener **Python** instalado.
+2. No necesitas conexión a internet ni instalar dependencias.
 3. Abre una ventana de comandos (cmd) o PowerShell.
-4. Navega a la carpeta del proyecto.
-5. Ejecuta:
+4. Navega a la carpeta `dist/main`.
+5. Ejecuta el archivo:
 
 ```cmd
-python main.py
+main.exe
 ```
 
 > 🔒 El juego utiliza una carpeta `lib/` con `pygame` preinstalado, por lo que funcionará sin conexión.
